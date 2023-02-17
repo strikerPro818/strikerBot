@@ -1,19 +1,26 @@
 import RPi.GPIO as GPIO
 import time
-GPIO.setwarnings(False)
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+
 GPIO.setup(17, GPIO.IN)
 
-GPIO.setup(13, GPIO.IN)
-GPIO.setup(6, GPIO.IN)
 GPIO.setup(5, GPIO.IN)
-GPIO.setup(21, GPIO.IN)
+
+GPIO.setup(6, GPIO.IN)
+GPIO.setup(5, GPIO.IN) #
+GPIO.setup(21, GPIO.IN) # Shooter Input
 
 GPIO.setup(26, GPIO.OUT)
+GPIO.setup(19, GPIO.OUT)
 
-pwm = GPIO.PWM(26, 100)
-pwm.start(0)
+shooter = GPIO.PWM(26, 100)
+shooter.start(0)
+
+feeder = GPIO.PWM(19, 100)
+feeder.start(0)
+
 
 def set_duty_cycle(distance):
     # Map the distance to a duty cycle
@@ -24,17 +31,24 @@ def set_duty_cycle(distance):
     voltage = (duty_cycle / 100) * (10 - 0.3) + 0.3
     # duty =
 
-    pwm.ChangeDutyCycle(duty_cycle)
-    return duty_cycle,voltage
+    shooter.ChangeDutyCycle(duty_cycle)
+    return duty_cycle, voltage
+
 
 while True:
-    if (GPIO.input(5) == True):
-        print("triggered")
-        pwm.ChangeDutyCycle(30)
+    # feeder.ChangeDutyCycle(0)
+
+    if (GPIO.input(21) == True):
+        print("shooter triggered")
+        shooter.ChangeDutyCycle(30)
     else:
-        pwm.ChangeDutyCycle(0)
+        shooter.ChangeDutyCycle(0)
 
-
+    if (GPIO.input(5) == True):
+        print("feeder triggered")
+        feeder.ChangeDutyCycle(100)
+    else:
+        feeder.ChangeDutyCycle(0)
 
     # if (GPIO.input(17) == True):
     #     print("Object Detected!")
