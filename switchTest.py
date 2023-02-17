@@ -28,6 +28,14 @@ def set_duty_cycle(distance):
     return duty_cycle,voltage
 
 while True:
+    if (GPIO.input(5) == True):
+        print("triggered")
+        pwm.ChangeDutyCycle(30)
+    else:
+        pwm.ChangeDutyCycle(0)
+
+
+
     # if (GPIO.input(17) == True):
     #     print("Object Detected!")
     # else:
@@ -40,11 +48,15 @@ while True:
     # if (GPIO.input(6) == True):
     #     pass
     #     # hl.forget()
-    if (GPIO.input(5) == True):
-        pwm.ChangeDutyCycle(30)
+    # if (GPIO.input(5) == True):
+    #     print('triggered')
+    #     pwm.ChangeDutyCycle(40)
+    # if (True):
+    #     print('true')
+    #     pwm.ChangeDutyCycle(40)
 
-    if (GPIO.input(21) == True):
-        pwm.ChangeDutyCycle(0)
+    # if (GPIO.input(21) == True):
+    #     pwm.ChangeDutyCycle(0)
 
     # else:
     #     pwm.ChangeDutyCycle(30)
