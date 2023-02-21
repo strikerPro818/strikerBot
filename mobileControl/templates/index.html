@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gimbal Control</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.4.0/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mt-3">Gimbal Control</h1>
+        <div class="row mt-4">
+            <div class="col-12 col-md-6 mx-auto">
+                <form method="POST" action="{{ url_for('set_angle') }}">
+                    <div class="mb-3">
+                        <label for="angle" class="form-label">Angle:</label>
+                        <input type="range" class="form-range" min="0" max="180" step="1" id="angle" name="angle" value="90">
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary mt-3">Set Angle</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row mt-5">
+            <div class="col-12 col-md-6 mx-auto">
+                <div id="joystick"></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.7.0/dist/nipplejs.min.js"></script>
+    <script>
+        var options = {
+            zone: document.getElementById('joystick'),
+            mode: 'static',
+            position: {left: '50%', top: '50%'},
+            color: 'red'
+        };
+        var joystick = nipplejs.create(options);
+
+        joystick.on('move', function(evt, data) {
+            var angle = Math.floor(data.angle.degree);
+            document.getElementById('angle').value = angle;
+        });
+    </script>
+</body>
+</html>
