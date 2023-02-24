@@ -9,17 +9,17 @@ import time
 # sudo ip link set can0 up type can bitrate 1000000
 # sudo ifconfig can0 txqueuelen 65536
 
-# GPIO.setmode(GPIO.BCM)
-# GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
 #
 # GPIO.setup(26, GPIO.IN) # Shooter Input
 # GPIO.setup(19, GPIO.IN) # Feeder Input
 # GPIO.setup(13, GPIO.IN) # Learn Input
 # GPIO.setup(6, GPIO.IN) # Forget Input
 #
-# GPIO.setup(21, GPIO.OUT)
-# shooter = GPIO.PWM(26, 100)
-# shooter.start(0)
+GPIO.setup(26, GPIO.OUT)
+shooter = GPIO.PWM(26, 100)
+shooter.start(0)
 # shooterInput = GPIO.setup(26, GPIO.IN)
 #
 #
@@ -55,6 +55,7 @@ def learnByID(id):
     hl.learn(id)
 def forgetAll():
     hl.forget()
+
 
 
 
@@ -95,11 +96,14 @@ def manualExecute():
     pass
 
 
+# shooter.ChangeDutyCycle(30)
 
-while(True):
-    try:
-        pan(-90)
-        # visionAutoTrack()
-        # manualExecute()
-    except:
-        None
+# while(True):
+#     try:
+#         # shooter.ChangeDutyCycle(30)
+#
+#         # pan(-90)
+#         # visionAutoTrack()
+#         # manualExecute()
+#     except:
+#         None
