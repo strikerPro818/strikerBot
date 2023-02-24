@@ -15,7 +15,10 @@ print('test')
 # shooter.ChangeDutyCycle(30)
 
 while True:
-    shooter.ChangeDutyCycle(0)
+
+    shooter.ChangeDutyCycle(20)
+
+    # shooter.ChangeDutyCycle(30)
     # feeder.ChangeDutyCycle(100)
 
     # feeder.ChangeDutyCycle(0)
