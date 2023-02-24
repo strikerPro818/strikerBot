@@ -12,8 +12,13 @@ feeder.start(0)
 # feederInput = GPIO.setup(19, GPIO.IN)
 
 print('test')
-while True:
-    feeder.ChangeDutyCycle(0)
+# shooter.ChangeDutyCycle(30)
 
+while True:
     shooter.ChangeDutyCycle(0)
+    # feeder.ChangeDutyCycle(100)
+
+    # feeder.ChangeDutyCycle(0)
+
+    # shooter.ChangeDutyCycle(30)
 

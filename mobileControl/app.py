@@ -1,10 +1,12 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import RPi.GPIO as GPIO
 from src.rmd_x8 import RMD_X8
 import time
 
 # sudo ip link set can0 up type can bitrate 1000000
 # sudo ifconfig can0 txqueuelen 65536
+
+GPIO.setwarnings(False)
 
 GPIO.setmode(GPIO.BCM)
 robot = RMD_X8(0x141)
@@ -22,6 +24,7 @@ feeder.start(0)
 
 @app.route('/')
 def index():
+
     return render_template('index.html')
 
 @app.route('/set_angle', methods=['POST'])
@@ -34,11 +37,20 @@ def set_angle():
     time.sleep(1)
 
     robot.motor_stop()
-    # duty_cycle = angle / 18 + 2
-    # pwm.ChangeDutyCycle(duty_cycle)
-    # print(angle)
-    # return "OK"
+@app.route('/shoot', methods=['POST'])
+def shoot():
+    action = request.form['action']
+    if action == 'start':
+        shooter.ChangeDutyCycle(26)
+        print('20')
+        return jsonify(message='Shooting started')
+    elif action == 'stop':
+        shooter.ChangeDutyCycle(0)
+        return jsonify(message='Shooting stopped')
+    else:
+        return jsonify(message='Invalid action')
 
 if __name__ == '__main__':
+
     app.run(host='192.168.31.189', port=9090, debug=True)
     # app.run(host='192.168.1.5', port=9090, debug=True)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="pi@192.168.31.189:22 password (12)" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" autoUpload="Always" serverName="pi@192.168.31.189:22 password (26)" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="pi@192.168.31.189:22 password">
         <serverdata>
@@ -19,14 +19,63 @@
       <paths name="pi@192.168.31.189:22 password (11)">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/pycharm_project_540" local="$PROJECT_DIR$" />
+            <mapping deploy="/tmp/pycharm_project_852" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
       <paths name="pi@192.168.31.189:22 password (12)">
         <serverdata>
           <mappings>
-            <mapping deploy="/tmp/pycharm_project_273" local="$PROJECT_DIR$" />
+            <mapping deploy="/tmp/pycharm_project_54" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (13)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_280" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (14)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_220" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (15)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_258" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (16)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_955" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (17)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_557" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (18)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_492" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (19)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_137" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
@@ -34,6 +83,55 @@
         <serverdata>
           <mappings>
             <mapping deploy="/tmp/pycharm_project_171" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (20)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_325" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (21)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_527" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (22)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_438" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (23)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_183" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (24)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_10" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (25)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_991" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="pi@192.168.31.189:22 password (26)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/tmp/pycharm_project_831" local="$PROJECT_DIR$" />
           </mappings>
         </serverdata>
       </paths>
