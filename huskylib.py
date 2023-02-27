@@ -108,6 +108,8 @@ class HuskyLensLibrary:
     def writeToHuskyLens(self, cmd):
         self.lastCmdSent = cmd
         if(self.proto == "SERIAL"):
+            # pass
+            # print('pass',self.proto )
             self.huskylensSer.flush()
             self.huskylensSer.flushInput()
             self.huskylensSer.write(cmd)

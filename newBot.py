@@ -73,7 +73,7 @@ def pan(angleValue):
     print('AngleV:',angleValue)
 
 
-def visionAutoTrack(cam_pan=None):
+def visionAutoTrack():
     x = hl.blocks().x
     w = hl.blocks().width
     # robot.motor_stop()
@@ -95,6 +95,28 @@ def visionAutoTrack(cam_pan=None):
 def manualExecute():
     pass
 
+
+while True:
+    try:
+        x = hl.blocks().x
+        w = hl.blocks().width
+        # robot.motor_stop()
+
+        if (hl.learnedObjCount() > 0):
+            print(x, w)
+            x = x + (w / 2)
+            turn_x = float(x - (FRAME_W / 2))
+            turn_x /= float(FRAME_W / 2)
+            turn_x *= 5.0  # VFOV
+            cam_pan += -turn_x
+            print('Move: ', cam_pan - 90)
+            cam_pan = max(0, min(180, cam_pan))
+            # print('cam_pan',cam_pan)
+            pan(int(cam_pan - 90))
+        else:
+            robot.motor_stop()
+    except:
+        continue
 
 # shooter.ChangeDutyCycle(30)
 

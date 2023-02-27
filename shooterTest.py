@@ -32,7 +32,7 @@ def duty_cycle_to_voltage(D):
 try:
     while True:
         # pass
-        feeder.ChangeDutyCycle(0)
+        # feeder.ChangeDutyCycle(0)
 
 
 
@@ -41,7 +41,7 @@ try:
     # print(convertedDuty)
     # while True:
         # shooter.ChangeDutyCycle(convertedDuty)
-        # shooter.ChangeDutyCycle(20)
+        feeder.ChangeDutyCycle(0)
         # shooter.ChangeDutyCycle(20)
         #
         # # feeder.ChangeDutyCycle(0)

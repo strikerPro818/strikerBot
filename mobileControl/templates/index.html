@@ -129,11 +129,25 @@
 <!--            </div>-->
 <!--        </div>-->
 
-               <div class="row mt-4">
+        <div class="row mt-4">
             <div class="col-sm-4 offset-sm-4">
                 <button id="feeder-btn" class="btn btn-block btn-success">Feed</button>
             </div>
         </div>
+
+        <div class="row mt-4">
+            <div class="col-sm-4 offset-sm-4">
+                <button id="learn-btn" class="btn btn-block btn-success">Learn</button>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-sm-4 offset-sm-4">
+                <button id="autoTrack-btn" class="btn btn-block btn-success">Track</button>
+            </div>
+        </div>
+
+
     </div>
 
     <script type="text/javascript">
@@ -190,7 +204,7 @@
                 orientation: "horizontal",
                 range: "min",
                 min: 13,
-                max: 24,
+                max: 47,
                 value: 13,
                 slide: function( event, ui ) {
                     $( "#speed" ).html(ui.value);
@@ -236,7 +250,6 @@
                     url: '/feed',
                     type: 'POST',
                     data: {action: action},
-                    timeout: 5000,
                     success: function(response) {
                         if (action == 'start') {
                             $('#feeder-btn').removeClass('btn-success').addClass('btn-danger').text('Stop Feeder');
@@ -251,6 +264,49 @@
                     }
                 });
             });
+            $('#learn-btn').click(function() {
+                var action = $(this).text() === 'Learn' ? 'start' : 'stop';
+                $.ajax({
+                    url: '/learn',
+                    type: 'POST',
+                    data: {action: action},
+                    timeout: 5000,
+                    success: function(response) {
+                        if (action == 'start') {
+                            $('#learn-btn').removeClass('btn-success').addClass('btn-danger').text('Stop Learn');
+                            console.log(response)
+                        } else {
+                            $('#learn-btn').removeClass('btn-danger').addClass('btn-success').text('Learn');
+                            console.log(response)
+                        }
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+            $('#autoTrack-btn').click(function() {
+                var action = $(this).text() === 'Track' ? 'start' : 'stop';
+                $.ajax({
+                    url: '/track',
+                    type: 'POST',
+                    data: {action: action},
+                    timeout: 5000,
+                    success: function(response) {
+                        if (action == 'start') {
+                            $('#autoTrack-btn').removeClass('btn-success').addClass('btn-danger').text('Stop Tracking');
+                            console.log(response)
+                        } else {
+                            $('#autoTrack-btn').removeClass('btn-danger').addClass('btn-success').text('Track');
+                            console.log(response)
+                        }
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+
         });
 
         // const dutyCycleSlider = document.getElementById("shooter-slider");

@@ -145,7 +145,7 @@ while(True):
             
 #             sleep(0.3)
 #             pan(int(cam_pan-90))
-    except:continue
+    except :continue
         
 # while(True):
 #     try:
