@@ -96,9 +96,42 @@
                 <button id="submit-btn" class="btn btn-block btn-primary">Set Angle</button>
             </div>
         </div>
+
+
         <div class="row mt-4">
+            <div class="col-12">
+                <h1 class="text-center">Shooter Control</h1>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-sm-6 offset-sm-3">
+                <div id="shooter-slider"></div>
+            </div>
+        </div>
+
+<!--        <div class="row mt-4">-->
+<!--            <div class="col-sm-4 offset-sm-4">-->
+<!--                <button id="submitSpeed-btn" class="btn btn-block btn-primary">Set Speed</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <p class="text-center">Current shooter speed: <span id="speed">0</span></p>
+        </div>
+        </div>
+
+<!--        <div class="row mt-4">-->
+<!--            <div class="col-12">-->
+<!--                <h1 class="text-center">Feeder Control</h1>-->
+<!--            </div>-->
+<!--        </div>-->
+
+               <div class="row mt-4">
             <div class="col-sm-4 offset-sm-4">
-                <button id="shooter-btn" class="btn btn-block btn-success">Shoot</button>
+                <button id="feeder-btn" class="btn btn-block btn-success">Feed</button>
             </div>
         </div>
     </div>
@@ -123,7 +156,7 @@
                     type: 'POST',
                     data: {angle: angle},
                     success: function(response) {
-                        alert(response);
+                        console.log(response);
                     },
                     error: function(error) {
                         console.log(error);
@@ -131,18 +164,85 @@
                 });
             });
 
-            $('#shooter-btn').click(function() {
-                var action = $(this).text() === 'Shoot' ? 'start' : 'stop';
+            // $('#shooter-btn').click(function() {
+            //     var action = $(this).text() === 'Shoot' ? 'start' : 'stop';
+            //     $.ajax({
+            //         url: '/shoot',
+            //         type: 'POST',
+            //         data: {action: action},
+            //         success: function(response) {
+            //             if (action == 'start') {
+            //                 $('#shooter-btn').removeClass('btn-success').addClass('btn-danger').text('Stop Shooting');
+            //
+            //                 console.log(response)
+            //             } else {
+            //                 $('#shooter-btn').removeClass('btn-danger').addClass('btn-success').text('Shoot');
+            //                 console.log(response)
+            //             }
+            //         },
+            //         error: function(error) {
+            //             console.log(error);
+            //         }
+            //     });
+            // });
+
+             $( "#shooter-slider" ).slider({
+                orientation: "horizontal",
+                range: "min",
+                min: 13,
+                max: 24,
+                value: 13,
+                slide: function( event, ui ) {
+                    $( "#speed" ).html(ui.value);
+                }
+            });
+
+             $('#shooter-slider').on('slidechange', function(event, ui) {
+                var speed = ui.value;
                 $.ajax({
-                    url: '/shoot',
+                    url: '/set_speed',
+                    type: 'POST',
+                    data: {speed: speed},
+                    success: function(response) {
+                        console.log(response);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+            });
+
+
+            // $('#submitSpeed-btn').click(function() {
+            //     var speed = $('#speed').int();
+            //     $.ajax({
+            //         url: '/set_speed',
+            //         type: 'POST',
+            //         data: {speed: speed},
+            //         success: function(response) {
+            //             alert(response);
+            //         },
+            //         error: function(error) {
+            //             console.log(error);
+            //         }
+            //     });
+            // });
+
+
+
+            $('#feeder-btn').click(function() {
+                var action = $(this).text() === 'Feed' ? 'start' : 'stop';
+                $.ajax({
+                    url: '/feed',
                     type: 'POST',
                     data: {action: action},
+                    timeout: 5000,
                     success: function(response) {
                         if (action == 'start') {
-                            $('#shooter-btn').removeClass('btn-success').addClass('btn-danger').text('Stop Shooting');
+                            $('#feeder-btn').removeClass('btn-success').addClass('btn-danger').text('Stop Feeder');
                             console.log(response)
                         } else {
-                            $('#shooter-btn').removeClass('btn-danger').addClass('btn-success').text('Shoot');
+                            $('#feeder-btn').removeClass('btn-danger').addClass('btn-success').text('Feed');
                             console.log(response)
                         }
                     },
@@ -152,6 +252,30 @@
                 });
             });
         });
+
+        // const dutyCycleSlider = document.getElementById("shooter-slider");
+        // const dutyCycleValue = document.getElementById("duty-cycle-value");
+        //
+        // function updateDutyCycleValue() {
+        //     dutyCycleValue.textContent = `${dutyCycleSlider.value}%`;
+        // }
+        //
+        // function sendDutyCycleValue() {
+        //     const dutyCycle = dutyCycleSlider.value;
+        //     fetch("/set_speed", {
+        //         method: "POST",
+        //         body: new URLSearchParams({
+        //             "duty_cycle": dutyCycle,
+        //         }),
+        //     });
+        // }
+        //
+        // updateDutyCycleValue();
+        //
+        // dutyCycleSlider.addEventListener("input", () => {
+        //     updateDutyCycleValue();
+        //     sendDutyCycleValue();
+        // });
     </script>
 </body>
 </html>

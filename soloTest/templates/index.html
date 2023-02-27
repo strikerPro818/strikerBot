@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Control PWM Signal with Flask</title>
+</head>
+<body>
+    <h1>Control PWM Signal</h1>
+    <div>
+        <label for="duty-cycle-slider">Duty Cycle:</label>
+        <input type="range" id="duty-cycle-slider" min="0" max="100" step="1">
+        <span id="duty-cycle-value"></span>
+    </div>
+
+    <script>
+        const dutyCycleSlider = document.getElementById("duty-cycle-slider");
+        const dutyCycleValue = document.getElementById("duty-cycle-value");
+
+        function updateDutyCycleValue() {
+            dutyCycleValue.textContent = `${dutyCycleSlider.value}%`;
+        }
+
+        function sendDutyCycleValue() {
+            const dutyCycle = dutyCycleSlider.value;
+            fetch("/set_duty_cycle", {
+                method: "POST",
+                body: new URLSearchParams({
+                    "duty_cycle": dutyCycle,
+                }),
+            });
+        }
+
+        updateDutyCycleValue();
+
+        dutyCycleSlider.addEventListener("input", () => {
+            updateDutyCycleValue();
+            sendDutyCycleValue();
+        });
+    </script>
+</body>
+</html>
