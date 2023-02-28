@@ -41,8 +41,8 @@ try:
     # print(convertedDuty)
     # while True:
         # shooter.ChangeDutyCycle(convertedDuty)
-        feeder.ChangeDutyCycle(0)
-        # shooter.ChangeDutyCycle(20)
+        # feeder.ChangeDutyCycle()
+        shooter.ChangeDutyCycle(0)
         #
         # # feeder.ChangeDutyCycle(0)
         # time.sleep(0.1)

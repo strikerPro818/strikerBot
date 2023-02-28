@@ -4,8 +4,8 @@ import time
 
 app = Flask(__name__)
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(26, GPIO.OUT)
-pwm = GPIO.PWM(26, 1000)
+GPIO.setup(19, GPIO.OUT)
+pwm = GPIO.PWM(19, 1000)
 pwm.start(0)
 last_duty_cycle = 0
 

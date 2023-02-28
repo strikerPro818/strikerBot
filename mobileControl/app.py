@@ -22,9 +22,15 @@ shooter = GPIO.PWM(26, 1000)
 shooter.start(0)
 last_duty_cycle = 0
 
-GPIO.setup(19, GPIO.OUT)
-feeder = GPIO.PWM(19, 100)
+
+GPIO.setup(19,GPIO.OUT)
+GPIO.output(19,GPIO.LOW)
+
+GPIO.setup(4, GPIO.OUT)
+feeder = GPIO.PWM(4, 100)
 feeder.start(0)
+
+
 
 startangle = 0
 anglestarted = 0
@@ -121,10 +127,14 @@ class FeedThread(threading.Thread):
     def run(self):
         action = self.action
         if action == 'start':
-            set_feeder_duty_cycle(100)
+            GPIO.output(19, GPIO.HIGH)
+
+            # set_feeder_duty_cycle(100)
             # feeder.ChangeDutyCycle(100)
         elif action == 'stop':
-            set_feeder_duty_cycle(0)
+            GPIO.output(19, GPIO.LOW)
+
+            # set_feeder_duty_cycle(0)
             # feeder.ChangeDutyCycle(0)
 class LearnThread(threading.Thread):
     def __init__(self, action):
@@ -214,7 +224,9 @@ def autoTrack():
 
 if __name__ == '__main__':
     try:
-        app.run(host='192.168.31.189', port=9090, debug=True)
+        # app.run(host='192.168.31.189', port=9090, debug=True)
+        app.run(host='172.20.10.3', port=9090, debug=True)
+
     finally:
         shooter.stop()  # Stop the PWM
         feeder.stop()
