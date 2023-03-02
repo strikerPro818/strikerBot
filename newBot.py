@@ -41,7 +41,7 @@ FRAME_W = 320
 FRAME_H = 240
 cam_pan = 90
 
-hl = HuskyLensLibrary("I2C", "", address=0x32)
+    hl = HuskyLensLibrary("I2C", "", address=0x32)
 def printObjectNicely(obj):
     count = 1
     if (type(obj) == list):

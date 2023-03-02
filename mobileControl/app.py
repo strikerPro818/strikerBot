@@ -29,6 +29,13 @@ GPIO.output(19,GPIO.LOW)
 GPIO.setup(4, GPIO.OUT)
 feeder = GPIO.PWM(4, 100)
 feeder.start(0)
+feederInput = GPIO.setup(13,GPIO.IN)
+
+
+GPIO.setup(21,GPIO.IN)
+GPIO.setup(20,GPIO.IN)
+GPIO.setup(16,GPIO.IN)
+GPIO.setup(12,GPIO.IN)
 
 
 
@@ -85,13 +92,13 @@ def panAngle(inputAngle):
 
 
     angle = inputAngle
-    target = angle * 100 * 6;
+    target = int(angle * 100 * 6);
     bb = target.to_bytes(4, 'little', signed=True)
     robot.position_closed_loop_1(bb)
 
-    time.sleep(1)
+    # time.sleep(1)
 
-    robot.motor_stop()
+    # robot.motor_stop()
 
 class ShootThread(threading.Thread):
     def __init__(self, duty_cycle):
@@ -164,6 +171,7 @@ class TrackThread(threading.Thread):
         self.action = action
 
     def run(self):
+        # flag = True
         cam_pan = 90
         # hl.learn(1)
         # print(hl.count())
@@ -174,37 +182,94 @@ class TrackThread(threading.Thread):
                 try:
                     x = hl.blocks().x
                     w = hl.blocks().width
-                    if action == 'start':
+                    if hl.learnedObjCount() > 0:
                         print(hl.count())
                         print(x, w)
                         x = x + (w / 2)
                         turn_x = float(x - (FRAME_W / 2))
                         turn_x /= float(FRAME_W / 2)
-                        turn_x *= 25.0  # VFOV
+                        turn_x *= 1.2  # VFOV
                         cam_pan += -turn_x
                         print('Move: ', cam_pan - 90)
                         cam_pan = max(0, min(180, cam_pan))
                         # print('cam_pan',cam_pan)
                         panAngle(int(cam_pan - 90))
                         print('Finished Adjusting')
-                except AttributeError and IndexError:
+
+
+
+                        # robot.motor_stop()
+                except AttributeError and IOError and IndexError:
+                    robot.motor_stop()
+
+
                     continue
-                    print('here')
 
-
-                    # print(hl.count(),'stop')
-
-                    # hl.forget()
 
         if action =='stop':
             try:
+                # flag = False
                 hl.forget()
+                robot.motor_stop()
             except AttributeError:
                 print('noraml fuck')
                 # print("Expected Error")
 
 
+class VoiceThread(threading.Thread):
 
+    def __init__(self, action):
+        threading.Thread.__init__(self)
+        self.action = action
+
+    def run(self):
+        action = self.action
+        if action == 'start':
+            while True:
+            # GPIO.output(19, GPIO.HIGH)
+                if GPIO.input(21) == True:
+                    print('shoot')
+                    shooter.ChangeDutyCycle(30)
+                    break
+                if GPIO.input(20) == True:
+                    print('not shoot')
+                    shooter.ChangeDutyCycle(0)
+                    break
+
+                if GPIO.input(16) == True:
+                    print('feed')
+                    # GPIO.output(19, GPIO.HIGH)
+                    break
+                if GPIO.input(12) == True:
+                    print('not feed')
+                    GPIO.output(19, GPIO.LOW)
+                    break
+
+            # GPIO.output(19, GPIO.HIGH)
+
+        # if shooterVoice == True:
+            #     shooter.ChangeDutyCycle(30)
+            # else:
+            #     print('not shoot')
+            #     shooter.ChangeDutyCycle(0)
+            # if fireEnableVoice == True:
+            #     GPIO.output(19, GPIO.HIGH)
+            # else:
+            #     print('not fire')
+            #
+            #     GPIO.output(19, GPIO.LOW)
+
+
+
+
+        elif action == 'stop':
+            print('fuck you')
+            # GPIO.output(19, GPIO.LOW)
+
+            # GPIO.output(19, GPIO.LOW)
+
+            # print('stop')
+            # GPIO.output(19, GPIO.LOW)
 @app.route('/feed', methods=['POST'])
 def feed():
     action = request.form['action']
@@ -221,11 +286,17 @@ def autoTrack():
     action = request.form['action']
     TrackThread(action).start()
     return jsonify(message='Track ' + action + 'ed')
+@app.route('/voice', methods=['POST'])
+def voiceControl():
+    action = request.form['action']
+    VoiceThread(action).start()
+    return jsonify(message='Voice ' + action + 'ed')
+
 
 if __name__ == '__main__':
     try:
-        # app.run(host='192.168.31.189', port=9090, debug=True)
-        app.run(host='172.20.10.3', port=9090, debug=True)
+        app.run(host='192.168.31.190', port=9090, debug=True)
+        # app.run(host='172.20.10.3', port=9090, debug=True)
 
     finally:
         shooter.stop()  # Stop the PWM
