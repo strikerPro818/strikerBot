@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocket Launch and Flight Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000;
+            font-family: 'Orbitron', sans-serif;
+            color: #00ff00;
+        }
+
+        #dashboard-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto auto auto;
+            grid-gap: 16px;
+            width: 100%;
+            max-width: 1200px;
+            padding: 16px;
+        }
+
+
+        #video-container {
+            grid-column: 1 / -1;
+            grid-row: 1 / 2;
+            position: relative;
+            border: 2px solid #00ff00;
+            border-radius: 5px;
+            overflow: hidden;
+            z-index: 1;
+            max-width: 100%;
+        }
+
+
+        #video {
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #data-container {
+            grid-column: 1 / 4;
+            grid-row: 2 / 3;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            grid-gap: 16px;
+            font-size: 16px;
+        }
+
+        .data-box {
+            background-color: rgba(0, 255, 0, 0.1);
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .data-box h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0;
+            margin-bottom: 8px;
+        }
+
+        .data-box span {
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        #video-button-container {
+            grid-row-start: 1;
+            grid-row-end: 2;
+            grid-column-start: 1;
+            grid-column-end: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .control-btn {
+            font-size: 24px;
+            background-color: #00ff00;
+            border: none;
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 8px;
+            transition: background-color 0.2s;
+        }
+
+        .control-btn:hover {
+            background-color: #00cc00;
+        }
+
+
+        @media (max-width: 480px) {
+            #data-container {
+                grid-column: 1 / 2;
+                grid-row: 3 / 4;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                grid-gap: 16px;
+                font-size: 16px;
+            }
+
+            .data-box h3 {
+                font-size: 16px;
+                margin-bottom: 4px;
+            }
+
+            .data-box span {
+                font-size: 20px;
+            }
+        }
+        #video-heading {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+
+    </style>
+</head>
+<body>
+
+<div id="dashboard-container">
+
+    <div id="video-button-container">
+<div id="video-heading">AI Tracking System</div>
+        <div id="video-container">
+
+
+            <img id="video" src="{{ url_for('video_feed') }}" alt="Video feed">
+        </div>
+
+        <div id="button-container">
+            <button id="left-btn" class="control-btn">←</button>
+            <button id="bottom-btn" class="control-btn">▼</button>
+            <button id="right-btn" class="control-btn">→</button>
+        </div>
+    </div>
+
+
+    <div id="data-container">
+        <div class="data-box">
+            <h3>Temperature</h3>
+            <span id="temp">25.0°C</span>
+        </div>
+        <div class="data-box">
+            <h3>Motor Angle</h3>
+            <span id="angle">180.0°</span>
+        </div>
+        <div class="data-box">
+            <h3>X</h3>
+            <span id="x-value">0</span>
+        </div>
+        <div class="data-box">
+            <h3>Y</h3>
+            <span id="y-value">0</span>
+        </div>
+        <div class="data-box">
+            <h3>Width</h3>
+            <span id="w-value">0</span>
+        </div>
+        <div class="data-box">
+            <h3>Height</h3>
+            <span id="h-value">0</span>
+        </div>
+
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+<script>
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const socket = io();
+        const video = document.getElementById('video');
+        const temp = document.getElementById('temp');
+        const angle = document.getElementById('angle');
+
+        const leftBtn = document.getElementById('left-btn');
+        const rightBtn = document.getElementById('right-btn');
+        const bottomBtn = document.getElementById('bottom-btn');
+        const xValue = document.getElementById('x-value');
+        const yValue = document.getElementById('y-value');
+        const wValue = document.getElementById('w-value');
+        const hValue = document.getElementById('h-value');
+
+
+        video.addEventListener('click', (event) => {
+            const rect = video.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            socket.emit('click_event', {x: x, y: y});
+        });
+
+        leftBtn.addEventListener('click', () => {
+            socket.emit('button_click', {direction: 'left'});
+        });
+
+        rightBtn.addEventListener('click', () => {
+            socket.emit('button_click', {direction: 'right'});
+        });
+
+        bottomBtn.addEventListener('click', () => {
+            socket.emit('button_click', {direction: 'bottom'});
+        });
+
+        socket.on('data_update', (data) => {
+            temp.textContent = data.temperature.toFixed(1) + '°C';
+            angle.textContent = data.motorAngle.toFixed(1) + '°';
+
+            // Add the following lines
+            xValue.textContent = data.x.toFixed(1);
+            yValue.textContent = data.y.toFixed(1);
+            wValue.textContent = data.w.toFixed(1);
+            hValue.textContent = data.h.toFixed(1);
+        });
+
+    });
+
+</script>
+</body>
+</html>
+

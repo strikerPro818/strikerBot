@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Video Feed with Object Tracking</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var img = $("#video_feed")[0];
+            var canvas = $("#canvas")[0];
+            var ctx = canvas.getContext("2d");
+            var width = canvas.width;
+            var height = canvas.height;
+            var bbox = null;
+            setInterval(function() {
+                ctx.drawImage(img, 0, 0, width, height);
+                if (bbox != null) {
+                    ctx.strokeStyle = "#00ff00";
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(bbox[0], bbox[1], bbox[2], bbox[3]);
+                }
+            }, 100);
+        });
+    </script>
+</head>
+<body>
+    <img id="video_feed" src="{{ url_for('video_feed') }}" style="display:none;">
+    <canvas id="canvas" width="640" height="480"></canvas>
+</body>
+</html>

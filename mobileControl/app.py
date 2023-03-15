@@ -182,7 +182,7 @@ class TrackThread(threading.Thread):
                 try:
                     x = hl.blocks().x
                     w = hl.blocks().width
-                    if hl.learnedObjCount() > 0:
+                    if hl.learnedObjCount() >= 0:
                         print(hl.count())
                         print(x, w)
                         x = x + (w / 2)

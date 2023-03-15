@@ -1,0 +1,69 @@
+#DEEPSORT:
+#  REID_CKPT: "/home/striker/Jetson/Xavier_NX/deep_sort/deep_sort/deep/checkpoint/ckpt.t7"
+#  MAX_DIST: 0.2
+#  MIN_CONFIDENCE: 0.3
+#  NMS_MAX_OVERLAP: 0.5
+#  MAX_IOU_DISTANCE: 0.7
+#  MAX_AGE: 70
+#  N_INIT: 3
+#  NN_BUDGET: 100
+#
+#DEEPSORT:
+#  REID_CKPT: "/home/striker/Jetson/Xavier_NX/deep_sort/deep_sort/deep/checkpoint/ckpt.t7"
+#  MAX_DIST: 0.15
+#  MIN_CONFIDENCE: 0.3
+#  NMS_MAX_OVERLAP: 0.5
+#  MAX_IOU_DISTANCE: 0.6
+#  MAX_AGE: 30
+#  N_INIT: 4
+#  NN_BUDGET: 100
+
+#DEEPSORT:
+#  REID_CKPT: "/home/striker/Jetson/Xavier_NX/deep_sort/deep_sort/deep/checkpoint/ckpt.t7"
+#  MAX_DIST: 0.25
+#  MIN_CONFIDENCE: 0.3
+#  NMS_MAX_OVERLAP: 0.5
+#  MAX_IOU_DISTANCE: 0.8
+#  MAX_AGE: 150 # Increase this value to allow tracks to survive even longer without detections
+#  N_INIT: 10 # Further increase this value to require more consecutive detections before a track is confirmed
+#  NN_BUDGET: 200
+
+#DEEPSORT:
+#  REID_CKPT: "/home/striker/Jetson/Xavier_NX/deep_sort/deep_sort/deep/checkpoint/ckpt.t7"
+#  MAX_DIST: 0.25
+#  MIN_CONFIDENCE: 0.3
+#  NMS_MAX_OVERLAP: 0.5
+#  MAX_IOU_DISTANCE: 0.8
+#  MAX_AGE: 300 # Increase this value to allow tracks to survive even longer without detections
+#  N_INIT: 30 # Further increase this value to require more consecutive detections before a track is confirmed
+#  NN_BUDGET: 200
+
+#DEEPSORT:
+#  REID_CKPT: "/home/striker/Jetson/Xavier_NX/deep_sort/deep_sort/deep/checkpoint/ckpt.t7"
+#  MAX_DIST: 0.2
+#  MIN_CONFIDENCE: 0.5
+#  NMS_MAX_OVERLAP: 0.4
+#  MAX_IOU_DISTANCE: 0.7
+#  MAX_AGE: 50
+#  N_INIT: 2
+#  NN_BUDGET: 50
+
+#DDEEPSORT:
+#  REID_CKPT: "/home/striker/Jetson/Xavier_NX/deep_sort/deep_sort/deep/checkpoint/ckpt.t7"
+#  MAX_DIST: 0.3
+#  MIN_CONFIDENCE: 0.6
+#  NMS_MAX_OVERLAP: 0.2
+#  MAX_IOU_DISTANCE: 0.8
+#  MAX_AGE: 150
+#  N_INIT: 4
+#  NN_BUDGET: 150
+
+#DEEPSORT:
+#  REID_CKPT: "/home/striker/Jetson/Xavier_NX/deep_sort/deep_sort/deep/checkpoint/ckpt.t7"
+#  MAX_DIST: 0.25
+#  MIN_CONFIDENCE: 0.6
+#  NMS_MAX_OVERLAP: 0.4
+#  MAX_IOU_DISTANCE: 0.6
+#  MAX_AGE: 80
+#  N_INIT: 6
+#  NN_BUDGET: 100

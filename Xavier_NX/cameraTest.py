@@ -7,6 +7,7 @@ model = torch.hub.load('ultralytics/yolov5', 'yolov5s', pretrained=True).cuda().
 
 # Initialize the video capture using the onboard camera
 cap = cv2.VideoCapture(0)
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"YUYV"))
 
 # Set the resolution to 640x480
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -22,7 +23,7 @@ while True:
         break
 
     # Convert the frame to a Torch tensor with 4 dimensions
-    tensor = torch.from_numpy(frame).to('cuda').float().div(255).unsqueeze(0)
+    tensor = torch.from_numpy(frame.transpose((2, 0, 1))).to('cuda').float().div(255).unsqueeze(0)
 
     # Apply the YOLOv5 object detection model to the tensor
     detections = model(tensor, size=640)

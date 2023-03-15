@@ -2,5 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/DeepSORT_YOLOv5_Pytorch" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/Yolov5-Deepsort" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deepSortPlayGround/deep_sort" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/facenet-retinaface-pytorch" vcs="Git" />
   </component>
 </project>

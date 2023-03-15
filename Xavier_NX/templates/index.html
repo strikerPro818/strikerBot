@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>YOLOv5 Human Tracking</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <h1>YOLOv5 Human Tracking</h1>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <script>
+      var video = document.getElementById('video');
+      var canvas = document.getElementById('canvas');
+      var context = canvas.getContext('2d');
+      var rois = [];
+
+      // Start the video stream
+      video.src = '/video_feed';
+      video.addEventListener('loadedmetadata', function() {
+        this.play();
+      });
+
+      // When the user clicks on the video, select the ROI
+      $(canvas).on('click', function(event) {
+        var x = event.offsetX;
+        var y = event.offsetY;
+        var w = 100;
+        var h = 100;
+        rois.push([x, y, w, h]);
+        context.strokeStyle = 'red';
+        context.strokeRect(x, y, w, h);
+        $.post('/select_roi', {'roi': x + ',' + y + ',' + w + ',' + h});
+      });
+    </script>
+  </body>
+</html>
