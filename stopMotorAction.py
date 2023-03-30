@@ -18,7 +18,7 @@ import os
 robot = RMD_X8(0x141)
 robot.setup()
 
-angle=-25
+angle=10
 target = angle*100*6;
 bb = target.to_bytes(4,'little',signed=True)
 robot.position_closed_loop_1(bb)

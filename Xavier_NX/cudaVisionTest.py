@@ -4,7 +4,8 @@ model = torch.hub.load('ultralytics/yolov5', 'yolov5s', force_reload=False)
 model.cuda()
 # cap = cv2.VideoCapture(0)
 # overlay_img = cv2.imread("/home/striker/Jetson/Xavier_NX/c2.png")
-cap = cv2.VideoCapture(2, cv2.CAP_V4L2)
+cap = cv2.VideoCapture(5, cv2.CAP_V4L2)
+# cap = cv2.VideoCapture(3)
 
 while True:
     # Capture frame-by-frame
@@ -29,7 +30,8 @@ while True:
             print(f"x: {x1}, y: {y1}, width: {x2 - x1}, height: {y2 - y1}")
             # alpha = 0.45  # Set the alpha value to control the opacity of the overlay
             # blended = cv2.addWeighted(frame, 1 - alpha, overlay_resized, alpha, 0)
-    # Display the resulting frame
+    # Display t
+    # he resulting frame
     cv2.imshow('frame', frame)
     # cv2.imshow("Overlay", blended)
     if cv2.waitKey(1) & 0xFF == ord('q'):

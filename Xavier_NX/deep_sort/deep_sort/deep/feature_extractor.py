@@ -23,7 +23,7 @@ class Extractor(object):
         
 
 
-    def _preprocess(self, im_crops):
+    def _preprocess_original(self, im_crops):
         """
         TODO:
             1. to float with scale from 0 to 1
@@ -38,6 +38,17 @@ class Extractor(object):
         im_batch = torch.cat([self.norm(_resize(im, self.size)).unsqueeze(0) for im in im_crops], dim=0).float()
         return im_batch
 
+    def _preprocess(self, im_crops):
+        def _resize(im, size):
+            if im.size == 0:
+                print("Warning: Empty image encountered. Skipping resizing.")
+                return None
+            return cv2.resize(im.astype(np.float32) / 255., size)
+
+        resized_images = [_resize(im, self.size) for im in im_crops]
+        valid_images = [self.norm(img).unsqueeze(0) for img in resized_images if img is not None]
+        im_batch = torch.cat(valid_images, dim=0).float()
+        return im_batch
 
     def __call__(self, im_crops):
         im_batch = self._preprocess(im_crops)

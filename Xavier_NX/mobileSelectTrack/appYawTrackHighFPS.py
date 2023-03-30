@@ -1,4 +1,4 @@
-import cv2
+import threading
 import torch
 import numpy as np
 from deep_sort.deep_sort import build_tracker
@@ -9,6 +9,11 @@ from src.rmd_x8 import RMD_X8
 import time
 from jtop import jtop
 import cv2
+from turbojpeg import TurboJPEG
+from turbojpeg import TurboJPEG, TJPF_BGR, TJFLAG_FASTDCT
+turboJPG = TurboJPEG()
+from PIL import Image
+
 # import threading
 
 
@@ -24,10 +29,17 @@ angleVector = 5
 cfg = get_config('/home/striker/Jetson/Xavier_NX/deep_sort/configs/deep_sort.yaml')
 
 use_cuda = True
-model = torch.hub.load('/home/striker/Jetson/Xavier_NX/model/', model='yolov5s', source='local').cuda()
-model.conf = 0.385
+# model = torch.hub.load('/home/striker/Jetson/Xavier_NX/model/', model='yolov5s', source='local').cuda()
+model = torch.hub.load('ultralytics/yolov5', 'custom', '/home/striker/.local/lib/python3.8/site-packages/yolov5/yolov5s.engine').cuda()
+model.conf = 0.42
 tracker = build_tracker(cfg, use_cuda)
-cap = cv2.VideoCapture(2, cv2.CAP_V4L2)
+cap = cv2.VideoCapture(4, cv2.CAP_V4L2)
+# cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'HEVC'))
+
+# cap.set(cv2.CAP_PROP_FPS, 30)
+
+
 # cap.set(cv2.CAP_PROP_FRAME_WIDTH, 160)
 # cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 160)
 # cap.set(cv2.CAP_PROP_BUFFERSIZE, 30)
@@ -43,6 +55,14 @@ highlighted_id = None
 
 app = Flask(__name__)
 socketio = SocketIO(app)
+
+deepsortConfig = {
+    'max_cosine_distance': 0.2,
+    'nn_budget': 100,
+    'max_iou_distance': 0.7,
+    'max_age': 30,
+    'n_init': 3
+}
 
 
 def panAngle(angle):
@@ -82,11 +102,17 @@ def gen_frames():
         if not ret:
             continue
         _, frame = cap.retrieve()
+
         frame_umat = cv2.UMat(frame)
-        # frame_umat = cv2.resize(frame_umat, (640, 640))
-        frame_umat = cv2.cvtColor(frame_umat, cv2.COLOR_BGR2RGB)
-        frame_resized = frame_umat.get()
+        frame_umat = cv2.resize(frame_umat, (640, 640))
+        frame_rgb = cv2.cvtColor(frame_umat, cv2.COLOR_BGR2RGB)
+        frame_resized = frame_rgb.get()
+        frame_resized = cv2.cvtColor(frame_resized, cv2.COLOR_RGB2BGR)
+        # frame_resized = cv2.resize(frame, (640, 480))
+
         results = model(frame_resized, size=640)
+
+
 
         bboxes = results.xywh[0][:, :4].cpu().numpy()
         confidences = results.xywh[0][:, 4].cpu().numpy()
@@ -99,11 +125,11 @@ def gen_frames():
         except ValueError or IndexError:
             print('Lost!')
             continue
-        frame_height, frame_width = frame.shape[:2]
+        frame_height, frame_width = frame_resized.shape[:2]
         scope_thickness = 2
         scope_color = (0, 0, 255)
-        cv2.line(frame, (0, frame_height // 2), (frame_width, frame_height // 2), scope_color, scope_thickness)
-        cv2.line(frame, (frame_width // 2, 0), (frame_width // 2, frame_height), scope_color, scope_thickness)
+        cv2.line(frame_resized, (0, frame_height // 2), (frame_width, frame_height // 2), scope_color, scope_thickness)
+        cv2.line(frame_resized, (frame_width // 2, 0), (frame_width // 2, frame_height), scope_color, scope_thickness)
 
         for output in outputs:
             x1, y1, x2, y2, _, track_id = output
@@ -118,11 +144,11 @@ def gen_frames():
             else:
                 sight_color = (0, 255, 0)
 
-            cv2.rectangle(frame, (center_x - sight_width // 2, center_y - sight_thickness // 2),
+            cv2.rectangle(frame_resized, (center_x - sight_width // 2, center_y - sight_thickness // 2),
                           (center_x + sight_thickness // 2, center_y + sight_width // 2), sight_color, -1)
 
 
-            cv2.line(frame, (center_x, center_y), (frame_width // 2, frame_height // 2), sight_color, 2)
+            cv2.line(frame_resized, (center_x, center_y), (frame_width // 2, frame_height // 2), sight_color, 2)
 
             if highlighted_id is not None and int(track_id) == highlighted_id:
                 color = (0, 0, 255)
@@ -137,14 +163,21 @@ def gen_frames():
 
             # send_data_update(center_x, center_y, x1, y1, x2, y2,cam_pan - 90)
 
-            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-            cv2.putText(frame, text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+            cv2.rectangle(frame_resized, (x1, y1), (x2, y2), color, 2)
+            cv2.putText(frame_resized, text, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
 
-        _, jpeg = cv2.imencode('.jpg', frame)
-        frame = jpeg.tobytes()
+        # _, jpeg = cv2.imencode('.jpg', frame)
+
+        # frame_resized = cv2.resize(frame_resized,(320,320))
+
+        # encoded_image = turboJPG.encode(frame_resized,quality=50)
+        encoded_image = turboJPG.encode(frame_resized, quality=80, pixel_format=TJPF_BGR, flags=TJFLAG_FASTDCT)
+
+
+        # send the encoded image over the network
         yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+               b'Content-Type: image/jpeg\r\n\r\n' + encoded_image + b'\r\n\r\n')
 
 
 @app.route('/video_feed')
@@ -190,7 +223,7 @@ def handle_button_click(data):
     panAngle(int(cam_pan - 90))
 
 last_sent = 0
-update_interval = 2  # Send data every 0.1 seconds
+update_interval = 10  # Send data every 0.1 seconds
 def send_data_update(center_x, center_y, x1, y1, x2, y2, angleInput):
     global last_sent, update_interval
 
@@ -217,8 +250,29 @@ def send_data_update(center_x, center_y, x1, y1, x2, y2, angleInput):
         'h': h
     }
     socketio.emit('data_update', data)
+@socketio.on('deepsort_config')
+def handle_deepsort_config(data):
+    global deepsortConfig, tracker
 
+    # update the values of the deepsortConfig dictionary
+    deepsortConfig['max_cosine_distance'] = float(data['max_cosine_distance'])
+    deepsortConfig['nn_budget'] = int(data['nn_budget'])
+    deepsortConfig['max_iou_distance'] = float(data['max_iou_distance'])
+    deepsortConfig['max_age'] = int(data['max_age'])
+    deepsortConfig['n_init'] = int(data['n_init'])
+
+    # rebuild the tracker object with the updated configuration
+    tracker = build_tracker(get_config(deepsortConfig), use_cuda=True)
+
+
+
+# if __name__ == '__main__':
+#     socketio.run(app, host='192.168.31.177', port=9090, allow_unsafe_werkzeug=True)
 
 if __name__ == '__main__':
     socketio.run(app, host='192.168.31.177', port=9090, allow_unsafe_werkzeug=True)
-
+    robot.motor_stop()
+    # t = threading.Thread(target=gen_frames)
+    # t.start()
+    # s =threading.Thread(target=send_data_update())
+    # s.start()
