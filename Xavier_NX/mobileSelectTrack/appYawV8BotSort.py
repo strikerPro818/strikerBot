@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, request
 from flask_socketio import SocketIO, emit
 from src.rmd_x8 import RMD_X8
 from jtop import jtop
@@ -7,6 +7,8 @@ from turbojpeg import TurboJPEG, TJPF_BGR, TJFLAG_FASTDCT
 import time
 from ultralytics import YOLO
 import Jetson.GPIO as GPIO
+# import jsonify
+import requests
 
 GPIO.setwarnings(False)
 
@@ -23,7 +25,6 @@ feeder.start(0)
 model = YOLO("/home/striker/.local/lib/python3.8/site-packages/yolov5/yolov8n.engine", task='detect')
 results = model.track(source=0, show=False, stream=True, tracker="botsort.yaml")
 
-
 turboJPG = TurboJPEG()
 robot = RMD_X8(0x141)
 robot.setup()
@@ -32,6 +33,7 @@ FRAME_W = cam_size
 FRAME_H = cam_size
 cam_pan = 90
 angleVector = 7
+prev_z_angle = None
 
 
 highlighted_id = None
@@ -41,19 +43,26 @@ latest_result = None
 app = Flask(__name__)
 socketio = SocketIO(app)
 
+
 def startShooter(speed):
     print('Shooter Current Speed:', speed)
     shooter.ChangeDutyCycle(speed)
+
+
 def stopShooter():
     print('Shooter Stopped')
     shooter.ChangeDutyCycle(0)
 
+
 def startFeeder(speed):
     print('Shooter Current Speed:', speed)
     feeder.ChangeDutyCycle(speed)
+
+
 def stopFeeder():
     print('Feeder Stopped')
     feeder.ChangeDutyCycle(0)
+
 
 def panAngle(angle):
     target = int(angle * 100 * 6)
@@ -79,6 +88,51 @@ def autoTrack(x1, x2):
     return cam_pan
 
 
+# @app.route('/gyro_data', methods=['POST'])
+# def gyro_data():
+#     global z_rotation_angle
+#     data = request.json  # Get the JSON data from the request
+#     print(data)
+#     z_rotation_angle = data.get('z')  # Extract the z-rotation angle from the JSON data
+#     gyroTrack(z_rotation_angle, True)  # Call the gyroTrack function to pan the camera if gyroTrack_on is True
+#
+#     return 'OK'  # Return a response to the POST request
+# @app.route('/gyro_data', methods=['POST'])
+# def gyro_data():
+#     data = request.get_json()
+#     print('Received gyro data:', data)
+#     # Do something with the received data
+#     return '', 204
+
+@app.route('/gyro_data', methods=['POST'])
+def handle_gyro_data():
+    global z_angle, gyroTrack_on
+    if request.method == 'POST':
+        gyro_data = request.get_json()
+        z_angle = gyro_data.get('z')
+        return '', 200
+    else:
+        gyroTrack_on = False
+        return '', 405
+def gyroTrack(z_rotation_angle, gyroTrack_on):
+    global cam_pan, angleVector, prev_z_angle
+
+    angle_change = 1 # Adjust this value to control the sensitivity of the angle change per degree of rotation
+    angle_threshold = 1.0  # Only update the angle if the absolute change is greater than this threshold
+    if z_rotation_angle == 0:
+        panAngle(0)
+    elif gyroTrack_on and (prev_z_angle is None or abs(z_rotation_angle - prev_z_angle) > angle_threshold):
+        panAngle(z_rotation_angle)
+
+        # prev_z_angle = z_rotation_angle
+        # cam_pan += angle_change * z_rotation_angle
+        # cam_pan = max(0, min(180, cam_pan))  # Ensure the angle is within the valid range
+        # panAngle(int(cam_pan - 90))
+
+
+
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -92,8 +146,13 @@ def gen_frames():
         latest_result = result
         # print(img)
         if result.boxes is not None:
+
             boxes = result.boxes.xyxy.to("cpu").numpy()
             classes = result.boxes.cls.to("cpu").numpy()
+
+            if gyroTrack_on:
+                gyroTrack(z_angle, True)
+
             if result.boxes.id is not None:
                 ids = result.boxes.id.numpy()
                 for box, cls, obj_id in zip(boxes, classes, ids):
@@ -125,9 +184,11 @@ def gen_frames():
 def video_feed():
     return Response(gen_frames(), content_type='multipart/x-mixed-replace; boundary=frame')
 
+
 @socketio.on('connect')
 def on_connect():
     print("Client connected")
+
 
 @socketio.on('click_event')
 def handle_click_event(data):
@@ -157,19 +218,27 @@ def handle_click_event(data):
     socketio.emit('frame_update', {'data': 'update frame', 'highlighted_id': highlighted_id})
 
 
-shooter_on, feeder_on = False, False
+shooter_on, feeder_on, gyroTrack_on = False, False, False
+z_rotation_angle = 0
+
 @socketio.on('button_click')
 def handle_button_click(data):
-    global cam_pan, shooter, feeder, shooter_on, feeder_on
+    global cam_pan, shooter, feeder, shooter_on, feeder_on, gyroTrack_on, z_rotation_angle
 
     angle_change = 10  # Adjust the value to control the angle change per click
 
     if data.get('direction') == 'left':
         cam_pan -= angle_change
+        cam_pan = max(0, min(180, cam_pan))  # Ensure the angle is within the valid range
+        panAngle(int(cam_pan - 90))
     elif data.get('direction') == 'right':
         cam_pan += angle_change
+        cam_pan = max(0, min(180, cam_pan))  # Ensure the angle is within the valid range
+        panAngle(int(cam_pan - 90))
     elif data.get('direction') == 'bottom':
         cam_pan = 90
+        cam_pan = max(0, min(180, cam_pan))  # Ensure the angle is within the valid range
+        panAngle(int(cam_pan - 90))
     elif data.get('direction') == 'shooter':
         if shooter_on:
             stopShooter()
@@ -186,8 +255,21 @@ def handle_button_click(data):
             feeder_on = True
 
 
-    cam_pan = max(0, min(180, cam_pan))  # Ensure the angle is within the valid range
-    panAngle(int(cam_pan - 90))
+    # elif data.get('direction') == 'gyroTrack':
+    #     if gyroTrack_on:
+    #         print('disable gyro',z_angle)
+    #         panAngle(0)
+    #         gyroTrack_on = False
+    #     else:
+    #         print('turn gyro',z_angle)
+    #         rollingFactor = 0.6
+    #         panAngle(z_angle*rollingFactor)
+    #         gyroTrack_on = True
+
+    elif data.get('direction') == 'gyroTrack':
+        gyroTrack_on = not gyroTrack_on  # Toggle the gyroTrack_on value
+        gyroTrack(z_rotation_angle, gyroTrack_on)
+
 
 
 
@@ -227,7 +309,5 @@ def send_data_update(center_x, center_y, x1, y1, x2, y2, angleInput):
 #     socketio.run(app, host='192.168.31.177', port=9090, allow_unsafe_werkzeug=True)
 
 if __name__ == '__main__':
-    try:
-        socketio.run(app, host='192.168.31.177', port=9090, allow_unsafe_werkzeug=True)
-    finally:
-        robot.motor_stop()
+    socketio.run(app, host='192.168.31.177', port=9090, allow_unsafe_werkzeug=True)
+

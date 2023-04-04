@@ -176,38 +176,39 @@
         <div class="Fire-buttons">
             <button id="shooter-btn" class="control-btn">S</button>
             <button id="feed-btn" class="control-btn">F</button>
+            <button id="gyro-btn" class="control-btn">GyroTrack</button>
         </div>
     </div>
 
 
-<!--    <div id="data-container">-->
-<!--        <div class="data-box">-->
-<!--            <h3>Temperature</h3>-->
-<!--            <span id="temp">25.0°C</span>-->
-<!--        </div>-->
-<!--        <div class="data-box">-->
-<!--            <h3>Motor Angle</h3>-->
-<!--            <span id="angle">180.0°</span>-->
-<!--        </div>-->
-<!--        <div class="data-box">-->
-<!--            <h3>X</h3>-->
-<!--            <span id="x-value">0</span>-->
-<!--        </div>-->
-<!--        <div class="data-box">-->
-<!--            <h3>Y</h3>-->
-<!--            <span id="y-value">0</span>-->
-<!--        </div>-->
-<!--        <div class="data-box">-->
-<!--            <h3>Width</h3>-->
-<!--            <span id="w-value">0</span>-->
-<!--        </div>-->
-<!--        <div class="data-box">-->
-<!--            <h3>Height</h3>-->
-<!--            <span id="h-value">0</span>-->
-<!--        </div>-->
+    <!--    <div id="data-container">-->
+    <!--        <div class="data-box">-->
+    <!--            <h3>Temperature</h3>-->
+    <!--            <span id="temp">25.0°C</span>-->
+    <!--        </div>-->
+    <!--        <div class="data-box">-->
+    <!--            <h3>Motor Angle</h3>-->
+    <!--            <span id="angle">180.0°</span>-->
+    <!--        </div>-->
+    <!--        <div class="data-box">-->
+    <!--            <h3>X</h3>-->
+    <!--            <span id="x-value">0</span>-->
+    <!--        </div>-->
+    <!--        <div class="data-box">-->
+    <!--            <h3>Y</h3>-->
+    <!--            <span id="y-value">0</span>-->
+    <!--        </div>-->
+    <!--        <div class="data-box">-->
+    <!--            <h3>Width</h3>-->
+    <!--            <span id="w-value">0</span>-->
+    <!--        </div>-->
+    <!--        <div class="data-box">-->
+    <!--            <h3>Height</h3>-->
+    <!--            <span id="h-value">0</span>-->
+    <!--        </div>-->
 
 
-<!--    </div>-->
+    <!--    </div>-->
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
@@ -225,6 +226,7 @@
         const bottomBtn = document.getElementById('bottom-btn');
         const shooterBtn = document.getElementById('shooter-btn');
         const feedBtn = document.getElementById('feed-btn');
+        const gyroBtn = document.getElementById('gyro-btn');
 
 
         const xValue = document.getElementById('x-value');
@@ -299,6 +301,13 @@
             const direction = 'feeder';
             socket.emit('button_click', {direction: direction});
         });
+        console.log("Attaching event listener for gyroBtn click");
+        gyroBtn.addEventListener('click', () => {
+            gyroBtn.classList.toggle('red');
+            const direction = 'gyroTrack';
+            socket.emit('button_click', {direction: direction});
+        });
+
 
         // Add event listener for canvas click/touch events
         function handleMouseEvent(event) {
@@ -322,6 +331,25 @@
             wValue.textContent = data.w.toFixed(1);
             hValue.textContent = data.h.toFixed(1);
         });
+
+        window.addEventListener('deviceorientation', function (event) {
+            let gyroDataDict = {
+                'x': event.beta.toFixed(2),
+                'y': event.gamma.toFixed(2),
+                'z': event.alpha.toFixed(2)  // Add the 'z' key to the JSON data
+            }
+
+            console.log(gyroDataDict);  // Add this line to print the gyroDataDict object to the console
+
+            $.ajax({
+                type: "POST",
+                url: "/gyro_data",
+                data: JSON.stringify(gyroDataDict),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json"
+            });
+        });
+
 
     });
 
