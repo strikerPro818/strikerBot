@@ -349,6 +349,7 @@ class RMD_X8:
                    0x00, 0x00, 0x00, 0x00]
         return self.send_cmd(message, 0.01)
 
+
     def read_motor_status_3(self):
         """
         Reads the phase current status data of the motor.
@@ -446,7 +447,8 @@ class RMD_X8:
         message = [0xA4, 0x00, data[0], data[1],
                    data[2], data[3], data[4], data[5]]
         return self.send_cmd(message, 0.01)
-    
+
+
     def position_closed_loop_6(self, data):
         """
         Control the position of the motor (multi-turn angle).
@@ -500,5 +502,7 @@ class RMD_X8:
         message = [0xA6, data[0], data[1], data[2],
                    data[3], data[4], 0x00, 0x00]
         return self.send_cmd(message, 0.01)
-    
-    
+
+
+
+

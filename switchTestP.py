@@ -4,14 +4,14 @@ import time
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-GPIO.setup(13, GPIO.IN)
+GPIO.setup(21, GPIO.IN)
 
 # GPIO.output(20, GPIO.LOW)
 
 
 
 while True:
-    if GPIO.input(13) == True:
-        print("ball triggered")
+    if GPIO.input(21) == True:
+        print("Triggered")
     else:
-        print("not triggered")
+        print("NO")

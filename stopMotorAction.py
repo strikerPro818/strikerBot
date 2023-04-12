@@ -17,12 +17,22 @@ import os
 
 robot = RMD_X8(0x141)
 robot.setup()
+# robot.motor_run()
 
-angle=10
+
+
+
+
+# robot.motor_run()
+print('finished')
+
+angle=40
 target = angle*100*6;
 bb = target.to_bytes(4,'little',signed=True)
 robot.position_closed_loop_1(bb)
-
-time.sleep(1)
-
-robot.motor_stop()
+# robot.position_closed_loop_2(bb)
+#
+#
+# time.sleep(0.5)
+#
+# robot.motor_stop()

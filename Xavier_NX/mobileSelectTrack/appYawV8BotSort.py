@@ -32,9 +32,9 @@ cam_size = 640
 FRAME_W = cam_size
 FRAME_H = cam_size
 cam_pan = 90
-angleVector = 7
+angleVector = 2
+desired_yaw_speed = 8000
 prev_z_angle = None
-
 
 highlighted_id = None
 selected_reid_feature = None
@@ -64,12 +64,21 @@ def stopFeeder():
     feeder.ChangeDutyCycle(0)
 
 
+# def panAngle(angle):
+#     target = int(angle * 100 * 6)
+#     bb = target.to_bytes(4, 'little', signed=True)
+#     print("Executed Angle:", angle)
+#     robot.position_closed_loop_1(bb)
+
 def panAngle(angle):
-    target = int(angle * 100 * 6)
-    bb = target.to_bytes(4, 'little', signed=True)
+    target = int(angle * 100)
+    desired_yaw_speed = 8000
+    angle_bytes = target.to_bytes(4, 'little', signed=True)
+    speed_bytes = desired_yaw_speed.to_bytes(2, 'little', signed=True)
+    data = list(speed_bytes) + list(angle_bytes)
     print("Executed Angle:", angle)
-    robot.position_closed_loop_1(bb)
-    time.sleep(0.01)
+    robot.position_closed_loop_2(data)
+    # time.sleep(0.01)
 
 
 def autoTrack(x1, x2):
@@ -82,7 +91,7 @@ def autoTrack(x1, x2):
     turn_x /= float(FRAME_W / 2)
     turn_x *= angleVector  # VFOV
     cam_pan += -turn_x
-    print('Moving: ', cam_pan - 90)
+    # print('Moving: ', cam_pan - 90)
     cam_pan = max(0, min(180, cam_pan))
     panAngle(int(cam_pan - 90))
     return cam_pan
@@ -114,10 +123,12 @@ def handle_gyro_data():
     else:
         gyroTrack_on = False
         return '', 405
+
+
 def gyroTrack(z_rotation_angle, gyroTrack_on):
     global cam_pan, angleVector, prev_z_angle
 
-    angle_change = 1 # Adjust this value to control the sensitivity of the angle change per degree of rotation
+    angle_change = 1  # Adjust this value to control the sensitivity of the angle change per degree of rotation
     angle_threshold = 1.0  # Only update the angle if the absolute change is greater than this threshold
     if z_rotation_angle == 0:
         panAngle(0)
@@ -128,9 +139,6 @@ def gyroTrack(z_rotation_angle, gyroTrack_on):
         # cam_pan += angle_change * z_rotation_angle
         # cam_pan = max(0, min(180, cam_pan))  # Ensure the angle is within the valid range
         # panAngle(int(cam_pan - 90))
-
-
-
 
 
 @app.route('/')
@@ -221,6 +229,7 @@ def handle_click_event(data):
 shooter_on, feeder_on, gyroTrack_on = False, False, False
 z_rotation_angle = 0
 
+
 @socketio.on('button_click')
 def handle_button_click(data):
     global cam_pan, shooter, feeder, shooter_on, feeder_on, gyroTrack_on, z_rotation_angle
@@ -271,8 +280,6 @@ def handle_button_click(data):
         gyroTrack(z_rotation_angle, gyroTrack_on)
 
 
-
-
 last_sent = 0
 update_interval = 1  # Send data every 0.1 seconds
 
@@ -310,4 +317,3 @@ def send_data_update(center_x, center_y, x1, y1, x2, y2, angleInput):
 
 if __name__ == '__main__':
     socketio.run(app, host='192.168.31.177', port=9090, allow_unsafe_werkzeug=True)
-
